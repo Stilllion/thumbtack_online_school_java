@@ -65,9 +65,9 @@ public class Point2D {
     }
 }
 
-/* Rect */
-class Rectangle{
-	// Fields
+
+class Rectangle
+{
 	private Point2D topLeft;
 	private Point2D bottomRight;
 	private int length;
@@ -220,7 +220,6 @@ class Rectangle{
 
 class Circle
 {
-	// Fields
 	private Point2D center;
 	private int radius;
 	
@@ -475,4 +474,3 @@ class Triangle
 		return Objects.hash(point1, point2, point3);
 	}
 }
-
