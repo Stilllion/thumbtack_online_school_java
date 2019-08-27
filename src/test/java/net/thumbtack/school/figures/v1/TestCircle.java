@@ -127,4 +127,28 @@ public class TestCircle {
         assertEquals(3, CircleFactory.getCircleCount());
     }
 
+    @Test
+    public void testCircleFactoryReset()
+    {
+        Circle circle1 = CircleFactory.createCircle(new Point2D(0, 0), 1);
+        Circle circle2 = CircleFactory.createCircle(new Point2D(3, 4), 1);
+        CircleFactory.reset();
+        assertEquals(0, CircleFactory.getCircleCount());
+    }
+
+    @Test
+    public void testSetCenter()  {
+        Circle circle = new Circle(1);
+        Point2D center = new Point2D(42, 42);
+        circle.setCenter(center);
+        assertEquals(center, circle.getCenter());
+    }
+
+    @Test
+    public void testSetRadius() {
+        Circle circle = new Circle(1);
+        circle.setRadius(42);
+        assertEquals(42, circle.getRadius());
+    }
+
 }
