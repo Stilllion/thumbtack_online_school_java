@@ -49,71 +49,78 @@ public class FirstSteps {
 	// Возвращает сумму чисел, заданных одномерным массивом array.
 	public int sum(int[] array)
 	{	
-		int ret_sum = 0;
+		int retSum = 0;
 		
-		for(int i : array){
-			ret_sum += i;
+		for (int i : array) {
+			retSum += i;
 		}
 		
-		return ret_sum;
+		return retSum;
 	}
 	
 	// Возвращает произведение чисел, заданных одномерным массивом array. 
 	public int mul(int[] array)
 	{
-		if(array.length == 0){ return 0; }
-
-		int ret_sum = 1;
-
-		for(int i : array){
-			ret_sum *= i;
+		if (array.length == 0) {
+			return 0; 
 		}
 
-		return ret_sum;
+		int retSum = 1;
+
+		for(int i : array){
+			retSum *= i;
+		}
+
+		return retSum;
 	}
 	
 	// Возвращает минимальное из чисел, заданных одномерным массивом array.
 	public int min(int[] array)
 	{
-		int min_value = Integer.MAX_VALUE;
+		int minValue = Integer.MAX_VALUE;
 		
-		for(int i : array){
-			if(i < min_value){
-				min_value = i;
+		for (int i : array) {
+			if (i < minValue) {
+				minValue = i;
 			}
 		}
 		
-		return min_value;
+		return minValue;
 	}
 	
 	// Возвращает максимальное из чисел, заданных одномерным массивом array. 
 	public int max(int[] array)
 	{
-		int max_value = Integer.MIN_VALUE;
+		int maxValue = Integer.MIN_VALUE;
 		
-		for(int i : array){
-			if(i > max_value){
-				max_value = i;
+		for (int i : array) {
+			if (i > maxValue) {
+				maxValue = i;
 			}
 		}
 		
-		return max_value;
+		return maxValue;
 	}
 	
 	// Возвращает среднее значение для чисел, заданных одномерным массивом array. 
 	public double average(int[] array)
 	{
-		if(array.length == 0) { return 0; }
+		if (array.length == 0) {
+			return 0; 
+		}
+		
 		return (double) sum(array) / array.length;
 	}
 	
 	// Возвращает true, если одномерный массив array строго упорядочен по убыванию, иначе false.
 	public boolean isSortedDescendant(int[] array)
 	{
-		if(array.length == 1){ return true; }
+		if (array.length == 1) {
+			return true;
+		}
 		
-		for(int i = 1; i < array.length; ++i){
-			if(array[i] >= array[i-1]){
+		for (int i = 1; i < array.length; ++i) {
+			if (array[i] >= array[i-1]) {
 				return false;
 			}
 		}
@@ -124,16 +131,18 @@ public class FirstSteps {
 	// Возводит все элементы одномерного массива array в куб.
 	public void cube(int[]array)
 	{
-		for(int i = 0; i < array.length; ++i){
-			array[i] = array[i] * array[i] * array[i]; 
+		for (int i = 0; i < array.length; ++i) {
+			array[i] = (int) Math.pow(array[i], 3);
 		}	
 	}
 	
 	// Возвращает true, если в одномерном массиве array имеется элемент, равный value, иначе false.
 	public boolean find(int[]array, int value)
 	{
-		for(int i : array){
-			if(i == value){ return true; }
+		for (int i : array) {
+			if (i == value) {
+				return true;
+			}
 		}
 		
 		return false;
@@ -144,7 +153,7 @@ public class FirstSteps {
 	{
 		int temp = 0;
 		
-		for(int s = 0, e = array.length - 1; s < array.length/ 2; ++s, --e){
+		for (int s = 0, e = array.length - 1; s < array.length/ 2; ++s, --e) {
 			temp = array[s];
 			
 			array[s] = array[e];
@@ -156,9 +165,12 @@ public class FirstSteps {
 	// Возвращает true, если одномерный массив является палиндромом, иначе false. Пустой массив считается палиндромом.
 	public boolean isPalindrome(int[]array)
 	{
-		for(int s = 0, e = array.length - 1; s < array.length/ 2; ++s, --e){
-			if(array[s] == array[e]) { continue; }
-			else { return false; }
+		for (int s = 0, e = array.length - 1; s < array.length/ 2; ++s, --e) {
+			if (array[s] == array[e]) {
+				continue;
+			} else {
+				return false; 
+			}
 		}
 		
 		return true;
@@ -167,56 +179,57 @@ public class FirstSteps {
 	// Возвращает сумму чисел, заданных двумерным массивом matrix.
 	public int sum(int[][] matrix)
 	{
-		int ret_sum = 0;
+		int retSum = 0;
 		
-		for(int row = 0; row < matrix.length; ++row){
-			for(int col = 0; col < matrix[row].length; ++col){
-				ret_sum += matrix[row][col];
+		for (int row = 0; row < matrix.length; ++row) {
+			for (int col = 0; col < matrix[row].length; ++col) {
+				retSum += matrix[row][col];
 			}
 		}
 		
-		return ret_sum;
+		return retSum;
 	}
 	
 	// Возвращает максимальное из чисел, заданных двумерным массивом matrix.
 	public int max(int[][] matrix)
 	{
 		
-		int max_value = Integer.MIN_VALUE;
+		int maxValue = Integer.MIN_VALUE;
 		
-		for(int row = 0; row < matrix.length; ++row){
-			for(int col = 0; col < matrix[row].length; ++col){
-				if(matrix[row][col] > max_value){
-					max_value = matrix[row][col];
+		for (int row = 0; row < matrix.length; ++row) {
+			for (int col = 0; col < matrix[row].length; ++col) {
+				if (matrix[row][col] > maxValue) {
+					maxValue = matrix[row][col];
 				}
 			}
 		}
 		
-		return max_value;
+		return maxValue;
 	}
 	
 	// Возвращает максимальное из чисел, находящихся на главной диагонали квадратного двумерного массива matrix.
 	public int diagonalMax(int[][] matrix)
 	{
-		int max_value = Integer.MIN_VALUE;
+		int maxValue = Integer.MIN_VALUE;
 		
-		for(int row = 0, col = 0; row < matrix.length; ++row, col = row){
-			if(matrix[row][col] > max_value){
-				max_value = matrix[row][col];
+		for (int row = 0, col = 0; row < matrix.length; ++row, col = row) {
+			if (matrix[row][col] > maxValue) {
+				maxValue = matrix[row][col];
 			}
 		}
 		
-		return max_value;
+		return maxValue;
 	}
 	// Возвращает true, если все строки двумерного массива matrix строго упорядочены по убыванию, иначе false.
 	// Пустая строка считается упорядоченной.
 	public boolean isSortedDescendant(int[][] matrix)
 	{
-		for(int[] row : matrix){
-			if(!isSortedDescendant(row)) { return false; }
+		for (int[] row : matrix) {
+			if (!isSortedDescendant(row)) {
+				return false;
+			}
 		}
 		
 		return true;
 	}
-
 }
