@@ -1,7 +1,12 @@
 package net.thumbtack.school.ttschool;
 
-public class Trainee
+import java.io.Serializable;
+import java.util.Objects;
+
+public class Trainee implements Serializable
 {
+	private static final long serialVersionUID = 42L;
+
 	private String firstName;
 	private String lastName;
 	private int rating;
@@ -53,5 +58,29 @@ public class Trainee
     public String getFullName()
 	{
 		return new StringBuilder(firstName + " " + lastName).toString();
+	}
+
+	@Override
+	public String toString() {
+		return "Trainee{" +
+				"firstName='" + firstName + '\'' +
+				", lastName='" + lastName + '\'' +
+				", rating=" + rating +
+				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Trainee trainee = (Trainee) o;
+		return rating == trainee.rating &&
+				Objects.equals(firstName, trainee.firstName) &&
+				Objects.equals(lastName, trainee.lastName);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(firstName, lastName, rating);
 	}
 }
