@@ -24,8 +24,6 @@ public class TestAddVacancy
 
     public UUID registerEmployer()
     {
-
-
         RegisterEmployerDtoRequest regReq = new RegisterEmployerDtoRequest("Thekla Inc.", "San Francisco", "blow@jon.com",
                 "Jonathan", "Blow", "jb", "qwerty123");
 

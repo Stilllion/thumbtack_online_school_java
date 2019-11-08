@@ -1,22 +1,31 @@
 package net.thumbtack.school.hiring.response.employer;
 
-public class SetVacancyActiveDtoResponse
+public class SetVacancyStatusDtoResponse
 {
-    String result;
+    String vacancyName;
+    boolean isActive;
     String error;
 
-    public SetVacancyActiveDtoResponse()
+    public SetVacancyStatusDtoResponse()
     {
         error = null;
-        result = null;
+        vacancyName = null;
     }
 
-    public String getResult() {
-        return result;
+    public String getVacancyName() {
+        return vacancyName;
     }
 
-    public void setResult(String result) {
-        this.result = result;
+    public void setVacancyName(String vacancyName) {
+        this.vacancyName = vacancyName;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public String getError() {

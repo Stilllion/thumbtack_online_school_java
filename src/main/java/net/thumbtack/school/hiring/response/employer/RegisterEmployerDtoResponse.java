@@ -8,7 +8,7 @@ public class RegisterEmployerDtoResponse
     String error;
     public RegisterEmployerDtoResponse()
     {
-        token = UUID.randomUUID();
+        token = null;
         error = null;
     }
 
@@ -20,6 +20,9 @@ public class RegisterEmployerDtoResponse
 
     public UUID getToken()
     {
+        if(token == null){
+            token = UUID.randomUUID();
+        }
         return token;
     }
 

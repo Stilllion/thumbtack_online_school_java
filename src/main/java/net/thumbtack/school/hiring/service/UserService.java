@@ -86,8 +86,8 @@ public class UserService
 
     public String changeFirstName(String jsonRequest)
     {
-        ChangeFirstNameDtoRequest req = gson.fromJson(jsonRequest, ChangeFirstNameDtoRequest.class);
-        ChangeFirstNameDtoResponse response = new ChangeFirstNameDtoResponse();
+        ChangeAccountDataDtoRequest req = gson.fromJson(jsonRequest, ChangeAccountDataDtoRequest.class);
+        ChangeAccountDataDtoResponse response = new ChangeAccountDataDtoResponse();
 
         try{
             req.validate();
@@ -100,9 +100,9 @@ public class UserService
 
         for(User u : registeredUsers){
             if(req.getToken().equals(u.getToken())){
-                u.setFirstName(req.getNewFirstName());
+                u.setFirstName(req.getData());
 
-                response.setNewFirstName(u.getFirstName());
+                response.setData(u.getFirstName());
                 return gson.toJson(response);
             }
         }
@@ -113,8 +113,8 @@ public class UserService
 
     public String changeLastName(String jsonRequest)
     {
-        ChangeLastNameDtoRequest req = gson.fromJson(jsonRequest, ChangeLastNameDtoRequest.class);
-        ChangeLastNameDtoResponse response = new ChangeLastNameDtoResponse();
+        ChangeAccountDataDtoRequest req = gson.fromJson(jsonRequest, ChangeAccountDataDtoRequest.class);
+        ChangeAccountDataDtoResponse response = new ChangeAccountDataDtoResponse();
 
         try{
             req.validate();
@@ -127,9 +127,36 @@ public class UserService
 
         for(User u : registeredUsers){
             if(u.getToken().equals(req.getToken())){
-                u.setLastName(req.getNewLastName());
+                u.setLastName(req.getData());
 
-                response.setNewLastName(u.getLastName());
+                response.setData(u.getLastName());
+                return gson.toJson(response);
+            }
+        }
+
+        response.setError(ServerErrorCode.TOKEN_NOT_FOUND.getErrorString());
+        return gson.toJson(response);
+    }
+
+    public String changeMiddleName(String jsonRequest)
+    {
+        ChangeAccountDataDtoRequest req = gson.fromJson(jsonRequest, ChangeAccountDataDtoRequest.class);
+        ChangeAccountDataDtoResponse response = new ChangeAccountDataDtoResponse();
+
+        try{
+            req.validate();
+        } catch (ServerException e){
+            response.setError(e.getErrorCode().getErrorString());
+            return gson.toJson(response);
+        }
+
+        List<User> registeredUsers = userDao.getRegisteredUsers();
+
+        for(User u : registeredUsers){
+            if(u.getToken().equals(req.getToken())){
+                u.setLastName(req.getData());
+
+                response.setData(u.getMiddleName());
                 return gson.toJson(response);
             }
         }
@@ -140,8 +167,8 @@ public class UserService
 
     public String changeEmail(String jsonRequest)
     {
-        ChangeEmailDtoRequest req = gson.fromJson(jsonRequest, ChangeEmailDtoRequest.class);
-        ChangeEmailDtoResponse response = new ChangeEmailDtoResponse();
+        ChangeAccountDataDtoRequest req = gson.fromJson(jsonRequest, ChangeAccountDataDtoRequest.class);
+        ChangeAccountDataDtoResponse response = new ChangeAccountDataDtoResponse();
 
         try{
             req.validate();
@@ -154,22 +181,21 @@ public class UserService
 
         for(User u : registeredUsers){
             if(u.getToken().equals(req.getToken())){
-                u.setFirstName(req.getNewEmail());
+                u.setEmail(req.getData());
 
-                response.setNewEmail(u.getEmail());
+                response.setData(u.getEmail());
                 return gson.toJson(response);
             }
         }
 
-        // TODO Maybe here we should return Server.ErrorCode.TOKEN_NOT_FOUND
         response.setError(ServerErrorCode.USER_NOT_FOUND.getErrorString());
         return gson.toJson(response);
     }
 
     public String changePassword(String jsonRequest)
     {
-        ChangePasswordDtoRequest req = gson.fromJson(jsonRequest, ChangePasswordDtoRequest.class);
-        ChangePasswordDtoResponse response = new ChangePasswordDtoResponse();
+        ChangeAccountDataDtoRequest req = gson.fromJson(jsonRequest, ChangeAccountDataDtoRequest.class);
+        ChangeAccountDataDtoResponse response = new ChangeAccountDataDtoResponse();
 
         try{
             req.validate();
@@ -182,9 +208,9 @@ public class UserService
 
         for(User u : registeredUsers){
             if(u.getToken().equals(req.getToken())){
-                u.setFirstName(req.getNewPassword());
+                u.setPassword(req.getData());
 
-                response.setNewPassword(u.getPassword());
+                response.setData(u.getPassword());
                 return gson.toJson(response);
             }
         }
@@ -192,20 +218,4 @@ public class UserService
         response.setError(ServerErrorCode.USER_NOT_FOUND.getErrorString());
         return gson.toJson(response);
     }
-
-    // TODO
-   /* public String removeAccount(String jsonRequest)
-    {
-        RemoveAccountDtoRequest request = gson.fromJson(jsonRequest, RemoveAccountDtoRequest.class);
-        RemoveAccountDtoResponse response = new RemoveAccountDtoResponse();
-
-        List<User> registeredUsers = userDao.getRegisteredUsers();
-
-        for(User u : registeredUsers){
-            if(u.getToken().equals(request.getToken())){
-                userDao.
-            }
-        }
-
-    }*/
 }

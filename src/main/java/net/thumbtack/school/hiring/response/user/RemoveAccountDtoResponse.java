@@ -1,15 +1,22 @@
 package net.thumbtack.school.hiring.response.user;
 
-import net.thumbtack.school.hiring.server.User;
-
 public class RemoveAccountDtoResponse
 {
-    User removedAccount;
+    String result;
     String error;
 
     public RemoveAccountDtoResponse()
     {
+        result = null;
         error = null;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 
     public String getError()

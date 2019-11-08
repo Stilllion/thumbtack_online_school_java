@@ -1,15 +1,14 @@
 package net.thumbtack.school.hiring.server.employer;
 
 import com.google.gson.Gson;
-import net.thumbtack.school.hiring.exception.ServerException;
 import net.thumbtack.school.hiring.request.employee.AddSkillDtoRequest;
 import net.thumbtack.school.hiring.request.employee.RegisterEmployeeDtoRequest;
 import net.thumbtack.school.hiring.request.employer.AddVacancyDtoRequest;
-import net.thumbtack.school.hiring.request.employer.GetEmployeesAnyLevelDtoRequest;
+import net.thumbtack.school.hiring.request.employer.GetEmployeesDtoRequest;
 import net.thumbtack.school.hiring.request.employer.RegisterEmployerDtoRequest;
 import net.thumbtack.school.hiring.response.employee.RegisterEmployeeDtoResponse;
 import net.thumbtack.school.hiring.response.employer.AddVacancyDtoResponse;
-import net.thumbtack.school.hiring.response.employer.GetEmployeesAnySkillDtoResponse;
+import net.thumbtack.school.hiring.response.employer.GetEmployeesDtoResponse;
 import net.thumbtack.school.hiring.response.employer.RegisterEmployerDtoResponse;
 import net.thumbtack.school.hiring.server.Employee;
 import net.thumbtack.school.hiring.server.Server;
@@ -185,9 +184,8 @@ public class TestGetEmployeesAnyLevel
         applicableEmployees.add(registeredEmployee.get(4));
 
        
-        GetEmployeesAnySkillDtoResponse response = gson.fromJson(s.getEmployeesAnyLevel(gson.toJson(
-                new GetEmployeesAnyLevelDtoRequest(
-                        employerToken, "Java programmer"))), GetEmployeesAnySkillDtoResponse.class );
+        GetEmployeesDtoResponse response = gson.fromJson(s.getEmployeesAnyLevel(gson.toJson(
+                new GetEmployeesDtoRequest(employerToken, "Java programmer"))), GetEmployeesDtoResponse.class );
 
         assertEquals(applicableEmployees.size(), response.getEmployeeList().size());
         assertEquals(applicableEmployees, response.getEmployeeList());

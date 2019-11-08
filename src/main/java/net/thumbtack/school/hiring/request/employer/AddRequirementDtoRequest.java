@@ -35,7 +35,6 @@ public class AddRequirementDtoRequest
         this.newSkill = newSkill;
     }
 
-
     public UUID getToken() {
         return token;
     }

@@ -1,17 +1,14 @@
 package net.thumbtack.school.hiring.server.employer;
 
 import com.google.gson.Gson;
-import net.thumbtack.school.hiring.exception.ServerException;
 import net.thumbtack.school.hiring.request.employee.AddSkillDtoRequest;
 import net.thumbtack.school.hiring.request.employee.RegisterEmployeeDtoRequest;
 import net.thumbtack.school.hiring.request.employer.AddVacancyDtoRequest;
-import net.thumbtack.school.hiring.request.employer.GetEmployeesRequiredLevelDtoRequest;
-import net.thumbtack.school.hiring.request.employer.GetEmployeesAnyLevelDtoRequest;
+import net.thumbtack.school.hiring.request.employer.GetEmployeesDtoRequest;
 import net.thumbtack.school.hiring.request.employer.RegisterEmployerDtoRequest;
 import net.thumbtack.school.hiring.response.employee.RegisterEmployeeDtoResponse;
 import net.thumbtack.school.hiring.response.employer.AddVacancyDtoResponse;
-import net.thumbtack.school.hiring.response.employer.GetEmployeesAllSkillsRequiredLevelDtoResponse;
-import net.thumbtack.school.hiring.response.employer.GetEmployeesAnySkillDtoResponse;
+import net.thumbtack.school.hiring.response.employer.GetEmployeesDtoResponse;
 import net.thumbtack.school.hiring.response.employer.RegisterEmployerDtoResponse;
 import net.thumbtack.school.hiring.server.*;
 import org.junit.jupiter.api.Test;
@@ -50,7 +47,7 @@ public class TestGetEmoloyeesAllSkills
 		
 		UUID employeeToken;
 
-        // First employee
+        // 1st employee
         regReq = new RegisterEmployeeDtoRequest(
                 "test@mail", "A", "L", "SeasonBelok", "123456");
         regResp = gson.fromJson(s.registerEmployee(gson.toJson(regReq)), RegisterEmployeeDtoResponse.class);
@@ -183,9 +180,9 @@ public class TestGetEmoloyeesAllSkills
         applicableEmployees.add(registeredEmployee.get(0));
         applicableEmployees.add(registeredEmployee.get(2));
 
-        GetEmployeesAllSkillsRequiredLevelDtoResponse response = gson.fromJson(s.getEmployeesAllSkillsRequiredLevel(gson.toJson(
-                new GetEmployeesRequiredLevelDtoRequest(
-                        employerToken, "Java programmer"))), GetEmployeesAllSkillsRequiredLevelDtoResponse.class );
+        GetEmployeesDtoResponse response = gson.fromJson(s.getEmployeesAllSkillsRequiredLevel(gson.toJson(
+                new GetEmployeesDtoRequest(
+                        employerToken, "Java programmer"))), GetEmployeesDtoResponse.class );
 
         assertEquals(applicableEmployees, response.getEmployeeList());
 

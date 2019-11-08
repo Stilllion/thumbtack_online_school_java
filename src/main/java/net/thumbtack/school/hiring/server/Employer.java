@@ -1,11 +1,14 @@
 package net.thumbtack.school.hiring.server;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Employer extends User
+public class Employer extends User implements Serializable
 {
     String companyName;
     String adress;
+
+    public Employer(){}
 
     public Employer(String companyName, String adress, String email, String firstName, String lastName, String login, String password)
     {

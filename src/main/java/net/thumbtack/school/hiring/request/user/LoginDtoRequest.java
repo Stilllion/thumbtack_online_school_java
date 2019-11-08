@@ -22,7 +22,7 @@ public class LoginDtoRequest
         return password;
     }
 
-    public boolean validate() throws ServerException
+    public void validate() throws ServerException
     {
         if(login == null || login.equals("")){
             throw new ServerException(ServerErrorCode.WRONG_LOGIN);
@@ -31,7 +31,5 @@ public class LoginDtoRequest
         if(password == null || password.equals("")){
             throw new ServerException(ServerErrorCode.WRONG_PASSWORD);
         }
-
-        return true;
     }
 }

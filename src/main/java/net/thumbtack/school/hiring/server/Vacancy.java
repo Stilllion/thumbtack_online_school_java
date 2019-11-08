@@ -1,10 +1,10 @@
 package net.thumbtack.school.hiring.server;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-public class Vacancy
+public class Vacancy implements Serializable
 {
     // Зарегистрированный работодатель может добавить свои вакансии. В вакансии указываются
     // название должности
@@ -84,12 +84,17 @@ public class Vacancy
         if (o == null || getClass() != o.getClass()) return false;
         Vacancy vacancy = (Vacancy) o;
         return salary == vacancy.salary &&
+                isActive == vacancy.isActive &&
                 Objects.equals(name, vacancy.name) &&
-                Objects.equals(requirements, vacancy.requirements);
+                Objects.equals(requirements, vacancy.requirements) &&
+                Objects.equals(employerEmail, vacancy.employerEmail) &&
+                Objects.equals(companyName, vacancy.companyName) &&
+                Objects.equals(employerFirstName, vacancy.employerFirstName) &&
+                Objects.equals(employerLastName, vacancy.employerLastName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, salary, requirements);
+        return Objects.hash(name, salary, requirements, isActive, employerEmail, companyName, employerFirstName, employerLastName);
     }
 }

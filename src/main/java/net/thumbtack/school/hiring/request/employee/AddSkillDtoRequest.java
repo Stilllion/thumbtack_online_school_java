@@ -41,7 +41,7 @@ public class AddSkillDtoRequest
         this.level = s.getLevel();
     }
 
-    public boolean validate() throws ServerException
+    public void validate() throws ServerException
     {
         if(name == null || name.equals("")){
             throw new ServerException(ServerErrorCode.WRONG_SKILL_NAME);
@@ -50,8 +50,6 @@ public class AddSkillDtoRequest
         if(level < 1 || level > 5){
             throw new ServerException(ServerErrorCode.WRONG_SKILL_LEVEL);
         }
-
-        return true;
     }
 
     public String getName() {

@@ -3,6 +3,7 @@ package net.thumbtack.school.hiring.request.employer;
 import net.thumbtack.school.hiring.exception.ServerErrorCode;
 import net.thumbtack.school.hiring.exception.ServerException;
 import net.thumbtack.school.hiring.server.Skill;
+import net.thumbtack.school.hiring.server.Vacancy;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +31,15 @@ public class AddVacancyDtoRequest
         this.token = token;
     }
 
-    public boolean validate() throws ServerException
+    public AddVacancyDtoRequest(UUID token, Vacancy v)
+    {
+        this.token = token;
+        name = v.getName();
+        salary = v.getSalary();
+        requirements = v.getRequirements();
+    }
+
+    public void validate() throws ServerException
     {
         if(name.equals("") || name == null){
             throw new ServerException(ServerErrorCode.WRONG_VACANCY_NAME);
@@ -49,8 +58,6 @@ public class AddVacancyDtoRequest
                 throw new ServerException(ServerErrorCode.WRONG_SKILL_LEVEL);
             }
         }
-
-        return true;
     }
 
     public String getName() {

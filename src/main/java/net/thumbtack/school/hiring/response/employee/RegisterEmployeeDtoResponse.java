@@ -1,7 +1,6 @@
 package net.thumbtack.school.hiring.response.employee;
 
 import net.thumbtack.school.hiring.server.Employee;
-import net.thumbtack.school.hiring.server.Employer;
 
 import java.util.UUID;
 

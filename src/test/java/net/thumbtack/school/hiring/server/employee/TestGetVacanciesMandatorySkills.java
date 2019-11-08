@@ -1,13 +1,12 @@
 package net.thumbtack.school.hiring.server.employee;
 
 import com.google.gson.Gson;
-import net.thumbtack.school.hiring.exception.ServerException;
 import net.thumbtack.school.hiring.request.employee.AddSkillDtoRequest;
-import net.thumbtack.school.hiring.request.employee.GetVacanciesMandatorySkillsDtoRequest;
+import net.thumbtack.school.hiring.request.employee.GetVacanciesDtoRequest;
 import net.thumbtack.school.hiring.request.employee.RegisterEmployeeDtoRequest;
 import net.thumbtack.school.hiring.request.employer.AddVacancyDtoRequest;
 import net.thumbtack.school.hiring.request.employer.RegisterEmployerDtoRequest;
-import net.thumbtack.school.hiring.response.employee.GetVacanciesMandatorySkillsDtoResponse;
+import net.thumbtack.school.hiring.response.GetVacanciesDtoResponse;
 import net.thumbtack.school.hiring.response.employee.RegisterEmployeeDtoResponse;
 import net.thumbtack.school.hiring.response.employer.AddVacancyDtoResponse;
 import net.thumbtack.school.hiring.response.employer.RegisterEmployerDtoResponse;
@@ -129,10 +128,10 @@ public class TestGetVacanciesMandatorySkills
         applicableVacancies.add(availableVacancies.get(2));
         applicableVacancies.add(availableVacancies.get(3));
 
-        GetVacanciesMandatorySkillsDtoRequest request = new GetVacanciesMandatorySkillsDtoRequest(employeeToken);
-        GetVacanciesMandatorySkillsDtoResponse response;
+        GetVacanciesDtoRequest request = new GetVacanciesDtoRequest(employeeToken);
+        GetVacanciesDtoResponse response;
 
-        response = gson.fromJson(s.getVacanciesMandatorySkills(gson.toJson(request)), GetVacanciesMandatorySkillsDtoResponse.class);
+        response = gson.fromJson(s.getVacanciesMandatorySkills(gson.toJson(request)),  GetVacanciesDtoResponse.class);
 
         System.out.println(response.getVacancies().size());
 

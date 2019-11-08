@@ -16,6 +16,22 @@ public class RemoveVacancyDtoRequest
         this.vacancyName = vacancyName;
     }
 
+    public UUID getToken() {
+        return token;
+    }
+
+    public void setToken(UUID token) {
+        this.token = token;
+    }
+
+    public String getVacancyName() {
+        return vacancyName;
+    }
+
+    public void setVacancyName(String vacancyName) {
+        this.vacancyName = vacancyName;
+    }
+
     public void validate() throws ServerException
     {
         if(token == null){

@@ -14,13 +14,11 @@ public class RemoveAccountDtoRequest
         this.token = token;
     }
 
-    public boolean validate() throws ServerException
+    public void validate() throws ServerException
     {
         if(token == null){
             throw new ServerException(ServerErrorCode.WRONG_TOKEN);
         }
-
-        return true;
     }
 
     public UUID getToken()

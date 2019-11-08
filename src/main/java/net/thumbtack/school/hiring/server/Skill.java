@@ -1,9 +1,9 @@
 package net.thumbtack.school.hiring.server;
 
-import javax.swing.*;
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Skill
+public class Skill implements Serializable
 {
     // Каждое требование к работнику состоит из 3 элементов
     // название требования - текстовая строка. Например, “язык Java”

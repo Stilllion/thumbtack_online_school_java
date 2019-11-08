@@ -1,20 +1,18 @@
 package net.thumbtack.school.hiring.server.employee;
 
 import com.google.gson.Gson;
-import net.thumbtack.school.hiring.exception.ServerException;
 import net.thumbtack.school.hiring.request.employee.AddSkillDtoRequest;
-import net.thumbtack.school.hiring.request.employee.GetVacanciesAnyLevelDtoRequest;
+import net.thumbtack.school.hiring.request.employee.GetVacanciesDtoRequest;
 import net.thumbtack.school.hiring.request.employee.RegisterEmployeeDtoRequest;
 import net.thumbtack.school.hiring.request.employer.AddVacancyDtoRequest;
 import net.thumbtack.school.hiring.request.employer.RegisterEmployerDtoRequest;
-import net.thumbtack.school.hiring.response.employee.GetVacanciesAnyLevelDtoResponse;
+import net.thumbtack.school.hiring.response.GetVacanciesDtoResponse;
 import net.thumbtack.school.hiring.response.employee.RegisterEmployeeDtoResponse;
 import net.thumbtack.school.hiring.response.employer.AddVacancyDtoResponse;
 import net.thumbtack.school.hiring.response.employer.RegisterEmployerDtoResponse;
 import net.thumbtack.school.hiring.server.*;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,7 +91,7 @@ public class TestGetVacanciesAnyLevel
 
         UUID token;
 
-        regReq = new RegisterEmployeeDtoRequest("lav2503@gmail.com", "Alexey", "Larshin", "SeasonBelok", "123456");
+        regReq = new RegisterEmployeeDtoRequest("test@mail.com", "A", "L", "SeasonBelok", "123456");
         regResp = gson.fromJson(s.registerEmployee(gson.toJson(regReq)), RegisterEmployeeDtoResponse.class);
 
         token = regResp.getToken();
@@ -113,30 +111,6 @@ public class TestGetVacanciesAnyLevel
         return token;
     }
 
-    private UUID registerEmployeeInvalidInput()
-    {
-        RegisterEmployeeDtoRequest regReq;
-        RegisterEmployeeDtoResponse regResp;
-
-        AddSkillDtoRequest addSkillReq;
-        Skill skill;
-
-        UUID token;
-
-        regReq = new RegisterEmployeeDtoRequest("test@mail", "A", "L", "SeasonBelok", "123456");
-        regResp = gson.fromJson(s.registerEmployee(gson.toJson(regReq)), RegisterEmployeeDtoResponse.class);
-
-        token = regResp.getToken();
-
-        skill = new Skill("", 1);
-        addSkillReq = new AddSkillDtoRequest(token, skill);
-        s.addSkill(gson.toJson(addSkillReq));
-
-        s.addSkill(gson.toJson(addSkillReq));
-
-        return token;
-    }
-
     @Test
     public void testGetVacanciesAnyLevel()
     {
@@ -151,10 +125,10 @@ public class TestGetVacanciesAnyLevel
         applicableVacancies.add(availableVacancies.get(2));
         applicableVacancies.add(availableVacancies.get(3));
 
-        GetVacanciesAnyLevelDtoRequest request = new GetVacanciesAnyLevelDtoRequest(employeeToken);
-        GetVacanciesAnyLevelDtoResponse response;
+        GetVacanciesDtoRequest request = new GetVacanciesDtoRequest(employeeToken);
+        GetVacanciesDtoResponse response;
 
-        response = gson.fromJson(s.getVacanciesAnyLevel(gson.toJson(request)), GetVacanciesAnyLevelDtoResponse.class);
+        response = gson.fromJson(s.getVacanciesAnyLevel(gson.toJson(request)), GetVacanciesDtoResponse.class);
 
         assertEquals(3, response.getVacancies().size());
 
@@ -165,9 +139,6 @@ public class TestGetVacanciesAnyLevel
         assertEquals("Java middle", response.getVacancies().get(0).getName());
         assertEquals("FullStack Dev", response.getVacancies().get(1).getName());
         assertEquals("Java junior", response.getVacancies().get(2).getName());
-
-        // TODO Invalid input
-
 
         testDao.resetDatabase();
     }

@@ -12,10 +12,11 @@ public class ChangeRequirementNameDtoRequest
     String newRequirementName;
     UUID token;
 
-    public ChangeRequirementNameDtoRequest(UUID token, String vacancyName, String newRequirementName)
+    public ChangeRequirementNameDtoRequest(UUID token, String vacancyName, String requirementName, String newRequirementName)
     {
         this.token = token;
         this.vacancyName = vacancyName;
+        this.requirementName = requirementName;
         this.newRequirementName = newRequirementName;
     }
 

@@ -3,6 +3,7 @@ package net.thumbtack.school.hiring.server;
 import net.thumbtack.school.hiring.exception.ServerException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class TestDao
@@ -31,7 +32,7 @@ public class TestDao
         return db.getVacancy(e, vacancyName);
     }
 
-    public List<Skill> getSkills(Employee e)
+    public List<Skill> getSkills(Employee e) throws ServerException
     {
         return db.getSkills(e);
     }
@@ -54,6 +55,16 @@ public class TestDao
     public List<Vacancy> getVacancies(Employer e) throws ServerException
     {
         return db.getVacancies(e);
+    }
+
+    public Map<Employer, List<Vacancy>> getVacanciesAll()
+    {
+        return db.getVacanciesAll();
+    }
+
+    public Map<Employee, List<Skill>> getSkillsAll()
+    {
+        return db.getSkillsAll();
     }
 
     public void resetDatabase()

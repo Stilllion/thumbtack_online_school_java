@@ -2,15 +2,21 @@ package net.thumbtack.school.hiring.service;
 
 import com.google.gson.Gson;
 import net.thumbtack.school.hiring.daoimpl.EmployeeDaoImpl;
+import net.thumbtack.school.hiring.exception.ServerErrorCode;
 import net.thumbtack.school.hiring.exception.ServerException;
 import net.thumbtack.school.hiring.request.employee.*;
 import net.thumbtack.school.hiring.request.user.RemoveAccountDtoRequest;
+import net.thumbtack.school.hiring.response.GetVacanciesDtoResponse;
 import net.thumbtack.school.hiring.response.employee.*;
 import net.thumbtack.school.hiring.response.user.RemoveAccountDtoResponse;
-import net.thumbtack.school.hiring.server.*;
+import net.thumbtack.school.hiring.server.Employee;
+import net.thumbtack.school.hiring.server.Employer;
+import net.thumbtack.school.hiring.server.Skill;
+import net.thumbtack.school.hiring.server.Vacancy;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EmployeeService
 {
@@ -60,20 +66,23 @@ public class EmployeeService
 
         try{
             req.validate();
+
+            Skill s = new Skill(req.getName(), req.getLevel());
+
+            for(Employee e : employeeDaoObj.getRegisteredEmployees()){
+                if(e.getToken().equals(req.getToken())){
+                    employeeDaoObj.addSkill(e, s);
+                    response.setEmployeeSkills(employeeDaoObj.getSkills(e));
+                    return gson.toJson(response);
+                }
+            }
+
         } catch (ServerException e){
             response.setError(e.getErrorCode().getErrorString());
             return gson.toJson(response);
         }
 
-        Skill s = new Skill(req.getName(), req.getLevel());
-
-        for(Employee e : employeeDaoObj.getRegisteredEmployees()){
-            if(e.getToken().equals(req.getToken())){
-                employeeDaoObj.addSkill(e, s);
-                response.setEmployeeSkills(employeeDaoObj.getSkills(e));
-            }
-        }
-
+        response.setError(ServerErrorCode.USER_NOT_FOUND.getErrorString());
         return gson.toJson(response);
     }
 
@@ -97,10 +106,10 @@ public class EmployeeService
     // В любой момент потенциальный работник может получить
     // список всех вакансий работодателей, для которых его набор умений
     // соответствует требованиям работодателя на уровне не ниже уровня, указанного в требовании
-    public String getVacanciesRequiredLevel(String requestJsonString)
+    public String getVacanciesRequiredLevel(String requestJson)
     {
-        GetVacanciesRequiredLevelDtoRequest request = gson.fromJson(requestJsonString, GetVacanciesRequiredLevelDtoRequest.class);
-        GetVacanciesRequiredLevelDtoResponse response = new GetVacanciesRequiredLevelDtoResponse();
+        GetVacanciesDtoRequest request = gson.fromJson(requestJson, GetVacanciesDtoRequest.class);
+        GetVacanciesDtoResponse response = new GetVacanciesDtoResponse();
 
         try{
             request.validate();
@@ -111,7 +120,7 @@ public class EmployeeService
             for (Employer e : employeeDaoObj.getRegisteredEmployers()) {
                 List<Vacancy> vacancies = employeeDaoObj.getVacancies(e);
                 for(Vacancy v : vacancies){
-                    if( hasRequiredSkills(skills, v.getRequirements())){
+                    if( hasRequiredSkills(skills, v.getRequirements()) && v.isActive()){
                         response.getVacancies().add(v);
                     }
                 }
@@ -152,8 +161,8 @@ public class EmployeeService
     // работодателя на уровне не ниже уровня, указанного в требовании
     public String getVacanciesMandatorySkills(String requestJson)
     {
-        GetVacanciesMandatorySkillsDtoRequest request = gson.fromJson(requestJson, GetVacanciesMandatorySkillsDtoRequest.class);
-        GetVacanciesMandatorySkillsDtoResponse response = new GetVacanciesMandatorySkillsDtoResponse();
+        GetVacanciesDtoRequest request = gson.fromJson(requestJson, GetVacanciesDtoRequest.class);
+        GetVacanciesDtoResponse response = new GetVacanciesDtoResponse();
 
         try {
             request.validate();
@@ -164,7 +173,7 @@ public class EmployeeService
             for (Employer e : employeeDaoObj.getRegisteredEmployers()) {
                 List<Vacancy> vacancies = employeeDaoObj.getVacancies(e);
                 for (Vacancy v : vacancies) {
-                    if (hasMandatorySkills(skills, v.getRequirements())) {
+                    if (hasMandatorySkills(skills, v.getRequirements()) && v.isActive()) {
                         response.getVacancies().add(v);
                     }
                 }
@@ -195,10 +204,10 @@ public class EmployeeService
     }
 
     // список всех потенциальных работников, имеющих все необходимые для этой вакансии умения на любом уровне
-    public String getVacanciesAnyLevel(String requestJsonString)
+    public String getVacanciesAnyLevel(String requestJson)
     {
-        GetVacanciesAnyLevelDtoRequest request = gson.fromJson(requestJsonString, GetVacanciesAnyLevelDtoRequest.class);
-        GetVacanciesAnyLevelDtoResponse response = new GetVacanciesAnyLevelDtoResponse();
+        GetVacanciesDtoRequest request = gson.fromJson(requestJson, GetVacanciesDtoRequest.class);
+        GetVacanciesDtoResponse response = new GetVacanciesDtoResponse();
 
         try {
             request.validate();
@@ -211,7 +220,7 @@ public class EmployeeService
                 List<Vacancy> vacancies = employeeDaoObj.getVacancies(e);
 
                 for (Vacancy v : vacancies) {
-                    if (hasSkillsOnAnyLevel(skills, v.getRequirements())) {
+                    if (hasSkillsOnAnyLevel(skills, v.getRequirements()) && v.isActive()) {
                         response.getVacancies().add(v);
                     }
                 }
@@ -228,27 +237,32 @@ public class EmployeeService
     // из списка в требовании работодателя на уровне не ниже уровня, указанного в требовании.
     // В этом случае список выдается отсортированным по числу найденных умений,
     // то есть в начале списка приводятся те вакансии работодателей, для которых работник имеет большее число умений.
-    private boolean hasAnySkill(List<Skill> skills, List<Skill> requirements)
+    private int hasAnySkill(List<Skill> skills, List<Skill> requirements)
     {
+        int numberOfRequrementsCovered = 0;
+
         for (Skill requiredSkill : requirements) {
             for (Skill s : skills) {
-                if(s.getName().equals(requiredSkill.getName())){
-                    if (s.getLevel() < requiredSkill.getLevel()) {
-                        return false;
-                    }
+                if(s.getName().equals(requiredSkill.getName()) && s.getLevel() >= requiredSkill.getLevel()){
+                    numberOfRequrementsCovered += 1;
                 }
             }
-        }
-        return true;
-    }
-    // список всех потенциальных работников,
-    // имеющих хотя бы одно  необходимое для этой вакансии умение на уровне не ниже уровня, указанного в требовании
-    public String getVacanciesAnySkill(String requestJsonString) {
-        List<Vacancy> retVacancies = new ArrayList<>();
-        List<Skill> skills;
 
-        GetVacanciesAnyLevelDtoRequest request = gson.fromJson(requestJsonString, GetVacanciesAnyLevelDtoRequest.class);
-        GetVacanciesAnyLevelDtoResponse response = new  GetVacanciesAnyLevelDtoResponse();
+        }
+
+        return numberOfRequrementsCovered;
+    }
+
+    // TODO IMPLEMENT THIS METHOD
+    public String getVacanciesAnySkill(String requestJson)
+    {
+        // Maps Vacancies to the number of covered requirements
+        Map<Vacancy, Integer> vacancyToCoveredRequirements = new HashMap<>();
+        List<Skill> skills;
+        int coveredRequirements = 0;
+
+        GetVacanciesDtoRequest request = gson.fromJson(requestJson, GetVacanciesDtoRequest.class);
+        GetVacanciesDtoResponse response = new GetVacanciesDtoResponse();
 
         try {
             request.validate();
@@ -258,11 +272,29 @@ public class EmployeeService
             for (Employer e : employeeDaoObj.getRegisteredEmployers()) {
                 List<Vacancy> vacancies = employeeDaoObj.getVacancies(e);
                 for (Vacancy v : vacancies) {
-                    if (hasSkillsOnAnyLevel(skills, v.getRequirements())) {
-                        response.getVacancies().add(v);
+                    coveredRequirements = hasAnySkill(skills, v.getRequirements());
+                    if (coveredRequirements > 0 && v.isActive())
+                    {
+                        vacancyToCoveredRequirements.put(v, coveredRequirements);
                     }
                 }
             }
+
+            int maxNumber = -9999;
+            Vacancy maxRequirementsCovered = null;
+            for (int i = 0; i < vacancyToCoveredRequirements.size(); ++i) {
+                for (Vacancy v : vacancyToCoveredRequirements.keySet()) {
+                    if (vacancyToCoveredRequirements.get(v) > maxNumber){
+                        maxNumber = vacancyToCoveredRequirements.get(v);
+                        maxRequirementsCovered = v;
+                    }
+                }
+
+                response.getVacancies().add(maxRequirementsCovered);
+                vacancyToCoveredRequirements.remove(maxRequirementsCovered);
+                maxNumber = -9999;
+            }
+
         } catch (ServerException exception){
             response.setError(exception.getErrorCode().getErrorString());
             return gson.toJson(response);
@@ -271,34 +303,99 @@ public class EmployeeService
         return gson.toJson(response);
     }
 
-   /* public String removeAccount(String jsonRequest)
-    {
-        RemoveAccountDtoRequest req = gson.fromJson(jsonRequest,  RemoveAccountDtoRequest.class);
+    public String removeSkill(String jsonRequest)
+	{
+		RemoveSkillDtoRequest request = gson.fromJson(jsonRequest, RemoveSkillDtoRequest.class);
+        UpdateEmployeeProfileDtoResponse response = new UpdateEmployeeProfileDtoResponse();
 
         try{
-            req.validate();
-        } catch (ServerException e){
-            return gson.toJson(e.getErrorCode().getErrorString());
+            request.validate();
+
+			for(Employee e : employeeDaoObj.getRegisteredEmployees()){
+				if(e.getToken().equals(request.getToken())){
+					employeeDaoObj.removeSkill(e, request.getSkillName());
+					return gson.toJson(response);
+				}
+			}
+        } catch(ServerException e) {
+            response.setError(e.getErrorCode().getErrorString());
+            return gson.toJson(response);
         }
 
-        Employee accountToBeRemoved = null;
+		response.setError(ServerErrorCode.TOKEN_NOT_FOUND.getErrorString());
+        return gson.toJson(response);
+	}
 
-        for(Employee e : employeeDaoObj.getRegisteredEmployees()) {
-            if (e.getToken().equals(req.getToken())) {
-                accountToBeRemoved = e;
+    public String changeSkillLevel(String jsonRequest)
+    {
+		ChangeSkillLevelDtoRequest request = gson.fromJson(jsonRequest, ChangeSkillLevelDtoRequest.class);
+        UpdateEmployeeProfileDtoResponse response = new UpdateEmployeeProfileDtoResponse();
+
+        try{
+            request.validate();
+
+			for(Employee e : employeeDaoObj.getRegisteredEmployees()){
+				if(e.getToken().equals(request.getToken())){
+					int newLevel = employeeDaoObj.setSkillLevel(e, request.getSkillName(), request.getSkillLevel());
+					response.setResult(request.getSkillName() + " level is now set to " + newLevel);
+					return gson.toJson(response);
+				}
+			}
+        } catch(ServerException e) {
+            response.setError(e.getErrorCode().getErrorString());
+            return gson.toJson(response);
+        }
+
+		response.setError(ServerErrorCode.TOKEN_NOT_FOUND.getErrorString());
+        return gson.toJson(response);
+    }
+
+    public String setIsActive(String jsonRequest)
+    {
+        SetProfileIsActiveDtoRequest request = gson.fromJson(jsonRequest, SetProfileIsActiveDtoRequest.class);
+        UpdateEmployeeProfileDtoResponse response = new UpdateEmployeeProfileDtoResponse();
+
+        try{
+            request.validate();
+
+			for(Employee e : employeeDaoObj.getRegisteredEmployees()){
+				if(e.getToken().equals(request.getToken())){
+					if(e.setActive(request.isActive())){
+                        response.setResult("Your profile is now active");
+                    } else {
+					    response.setResult("Your profile is now inactive");
+                    }
+					return gson.toJson(response);
+				}
+			}
+        } catch(ServerException e) {
+            response.setError(e.getErrorCode().getErrorString());
+            return gson.toJson(response);
+        }
+
+		response.setError(ServerErrorCode.TOKEN_NOT_FOUND.getErrorString());
+        return gson.toJson(response);
+    }
+
+    public String removeAccount(String jsonRequest)
+    {
+        RemoveAccountDtoRequest request = gson.fromJson(jsonRequest,  RemoveAccountDtoRequest.class);
+        RemoveAccountDtoResponse response = new RemoveAccountDtoResponse();
+
+        try{
+            request.validate();
+
+            for(Employee e : employeeDaoObj.getRegisteredEmployees()) {
+                if (e.getToken().equals(request.getToken())) {
+                    employeeDaoObj.removeAccount(e);
+                    response.setResult("Your account has been removed");
+                }
             }
-        }
-
-        if(accountToBeRemoved == null){
-            return gson.toJson("error: Account not found");
-        }
-
-        try {
-            employeeDaoObj.removeAccount(accountToBeRemoved);
         } catch (ServerException e){
-            return gson.toJson(e.getErrorCode().getErrorString());
+            response.setError(e.getErrorCode().getErrorString());
+            return gson.toJson(response);
         }
 
-        return gson.toJson(new RemoveAccountDtoResponse(accountToBeRemoved));
-    }*/
+        return gson.toJson(response);
+    }
 }

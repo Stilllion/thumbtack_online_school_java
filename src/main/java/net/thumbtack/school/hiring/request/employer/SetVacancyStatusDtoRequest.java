@@ -5,13 +5,13 @@ import net.thumbtack.school.hiring.exception.ServerException;
 
 import java.util.UUID;
 
-public class SetVacancyActiveDtoRequest
+public class SetVacancyStatusDtoRequest
 {
     UUID token;
     String vacancyName;
     boolean isActive;
 
-    public SetVacancyActiveDtoRequest(UUID token, String vacancyName, boolean isActive)
+    public SetVacancyStatusDtoRequest(UUID token, String vacancyName, boolean isActive)
     {
         this.token = token;
         this.isActive = isActive;
@@ -48,7 +48,7 @@ public class SetVacancyActiveDtoRequest
             throw new ServerException(ServerErrorCode.WRONG_TOKEN);
         }
 
-        if(vacancyName.equals("") || vacancyName == null){
+        if(vacancyName == null || vacancyName.equals("")){
             throw new ServerException(ServerErrorCode.WRONG_VACANCY_NAME);
         }
     }

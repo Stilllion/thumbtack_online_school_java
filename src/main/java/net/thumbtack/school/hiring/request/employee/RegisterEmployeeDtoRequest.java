@@ -20,7 +20,7 @@ public class RegisterEmployeeDtoRequest
         this.password = password;
     }
 
-    public boolean validate() throws ServerException
+    public void validate() throws ServerException
     {
         if(email.equals("") || email == null){
             throw new ServerException(ServerErrorCode.WRONG_EMAIL);
@@ -42,7 +42,10 @@ public class RegisterEmployeeDtoRequest
             throw new ServerException(ServerErrorCode.WRONG_PASSWORD);
         }
 
-        return true;
+        // Password requirements
+        if(password.length() < 6){
+            throw new ServerException(ServerErrorCode.PASWWORD_TOOSHORT);
+        }
     }
 
     public String getEmail() {

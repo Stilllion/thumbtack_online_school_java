@@ -25,7 +25,7 @@ public class RegisterEmployerDtoRequest
         this.password = password;
     }
 
-    public boolean validate() throws ServerException
+    public void validate() throws ServerException
     {
         if(companyName.equals("") || companyName == null){
             throw new ServerException(ServerErrorCode.WRONG_COMPNAY_NAME);
@@ -55,7 +55,10 @@ public class RegisterEmployerDtoRequest
             throw new ServerException(ServerErrorCode.WRONG_PASSWORD);
         }
 
-        return true;
+        // Password requirements
+        if(password.length() < 6){
+            throw new ServerException(ServerErrorCode.PASWWORD_TOOSHORT);
+        }
     }
 
     public String getCompanyName() {

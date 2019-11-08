@@ -1,18 +1,22 @@
 package net.thumbtack.school.hiring.server;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
-public class User
+public class User implements Serializable
 {
     String email;
     String firstName;
     String lastName;
+    String middleName;
     String login;
     String password;
 
     UUID token;
     boolean isOnline;
+
+    public User(){}
 
     public User(String email, String login, String password, String firstName, String lastName)
     {
@@ -22,6 +26,13 @@ public class User
         this.login = login;
         this.password = password;
     }
+
+    public User(String email, String login, String password, String firstName, String lastName, String middleName)
+    {
+        this(email, login, password, firstName, lastName);
+        this.middleName = middleName;
+    }
+
 
     public String getEmail() {
         return email;
@@ -45,6 +56,16 @@ public class User
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getMiddleName()
+    {
+        return middleName;
+    }
+
+    public void setMiddleName(String middleName)
+    {
+        this.middleName = middleName;
     }
 
     public String getLogin() {
@@ -90,6 +111,7 @@ public class User
                 Objects.equals(email, user.email) &&
                 Objects.equals(firstName, user.firstName) &&
                 Objects.equals(lastName, user.lastName) &&
+                Objects.equals(middleName, user.middleName) &&
                 Objects.equals(login, user.login) &&
                 Objects.equals(password, user.password) &&
                 Objects.equals(token, user.token);
@@ -97,6 +119,6 @@ public class User
 
     @Override
     public int hashCode() {
-        return Objects.hash(email, firstName, lastName, login, password, token, isOnline);
+        return Objects.hash(email, firstName, lastName, middleName, login, password, token, isOnline);
     }
 }

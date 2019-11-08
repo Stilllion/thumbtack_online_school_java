@@ -22,21 +22,36 @@ public class Database {
 
     public void InsertEmployer(Employer e) throws ServerException
     {
-        if (registeredEmployers.contains(e)){
-            throw new ServerException(ServerErrorCode.DUPLICATE_EMPLOYER);
+        for(User u : getRegisteredUsers()){
+            if(u.getLogin().equals(e.getLogin())){
+                throw new ServerException(ServerErrorCode.DUPLICATE_LOGIN);
+            }
         }
+
         registeredEmployers.add(e);
     }
 
     public void InsertEmployee(Employee e) throws ServerException
     {
-        if (registeredEmployees.contains(e)){
-            throw new ServerException(ServerErrorCode.DUPLICATE_EMPLOYEE);
+        for(User u : getRegisteredUsers()){
+            if(u.getLogin().equals(e.getLogin())){
+                throw new ServerException(ServerErrorCode.DUPLICATE_LOGIN);
+            }
+
+            if(u.getEmail().equals(e.getEmail())){
+                throw new ServerException(ServerErrorCode.DUPLICATE_EMAIL);
+            }
         }
+
         registeredEmployees.add(e);
         // Add empty skill list to insert into one later
         List<Skill> skillArray = new ArrayList<>();
         skills.put(e, skillArray);
+    }
+
+    public Map<Employer, List<Vacancy>> getVacanciesAll()
+    {
+        return vacancies;
     }
 
     public List<Employer> getRegisteredEmployers()
@@ -95,7 +110,7 @@ public class Database {
 
     public void addVacancy(Employer e, Vacancy v) throws ServerException
     {
-        // Check for dublicates
+        // Check for duplicates
 
         if(vacancies.containsValue(v)){
             throw new ServerException(ServerErrorCode.DUPLICATE_VACANCY);
@@ -105,14 +120,25 @@ public class Database {
             vacancies.put(e, new ArrayList<Vacancy>());
         }
 
-        // TODO: Maybe we should change Vacancies container to Set<Vacancies>
-
         vacancies.get(e).add(v);
     }
 
-    //
-    // TODO: ALso add methods for inserting Array of skills (if there is one already, just move elements over to it)
-    //
+    // Method for the Employers, so they could choose existing skills to add to their vacancies
+    public List<Skill> getSkillsList()
+    {
+        List<Skill> retList = new ArrayList<>();
+
+        for(List<Skill> skillList : skills.values()){
+            retList.addAll(skillList);
+        }
+
+        return retList;
+    }
+
+    public void addSkillList(Employee e, List<Skill> skillList)
+    {
+        skills.get(e).addAll(skillList);
+    }
 
     public void addEmployeeSkill(Employee e, Skill s)
     {
@@ -142,9 +168,17 @@ public class Database {
         return vacancies.get(e);
     }
 
-    public List<Skill> getSkills(Employee e)
+    public List<Skill> getSkills(Employee e) throws ServerException
     {
+        if(!skills.containsKey(e)){
+            throw new ServerException(ServerErrorCode.EMPLOYEE_NOT_FOUND);
+        }
         return skills.get(e);
+    }
+
+    public Map<Employee, List<Skill>> getSkillsAll()
+    {
+        return skills;
     }
 
     public List<Vacancy> getVacancies(Employer e) throws ServerException
@@ -158,7 +192,7 @@ public class Database {
 
     public void removeAccountEmployer(Employer e) throws ServerException
     {
-        if(!registeredEmployers.contains(e)|| !vacancies.containsKey(e)){
+        if(!registeredEmployers.contains(e) || !vacancies.containsKey(e)){
             throw new ServerException(ServerErrorCode.EMPLOYER_NOT_FOUND);
         }
 
@@ -168,13 +202,31 @@ public class Database {
 
     public void removeAccountEmployee(Employee e) throws ServerException
     {
-        if(!registeredEmployees.contains(e)|| !skills.containsKey(e)){
+        if(!registeredEmployees.contains(e) || !skills.containsKey(e)){
             throw new ServerException(ServerErrorCode.EMPLOYEE_NOT_FOUND);
         }
 
         registeredEmployees.remove(e);
         skills.remove(e);
     }
+
+    public void removeSkill(Employee e, String skillName)
+    {
+
+    }
+
+    public int setSkillLevel(Employee e, String skillName, int newSkillLevel) throws ServerException
+    {
+        for(Skill s : skills.get(e)){
+            if(s.getName().equals(skillName)){
+                s.setLevel(newSkillLevel);
+                return s.getLevel();
+            }
+        }
+
+        throw new ServerException(ServerErrorCode.SKILLS_NOT_FOUND);
+    }
+
 
     public void reset()
     {

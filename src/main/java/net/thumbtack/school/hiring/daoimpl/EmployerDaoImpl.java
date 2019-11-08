@@ -36,7 +36,7 @@ public class EmployerDaoImpl implements EmployerDao
         return db.getVacancyList(e);
     }
 
-    public List<Skill> getSkills(Employee e)
+    public List<Skill> getSkills(Employee e) throws ServerException
     {
         return db.getSkills(e);
     }
