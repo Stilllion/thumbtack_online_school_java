@@ -9,8 +9,8 @@ CREATE TABLE trainee (
   rating INT(11) NOT NULL,
   PRIMARY KEY (id),
   
-  KEY/*INDEX*/ firstName (firstName),
-  KEY/*INDEX*/ lastName (lastName)
+  KEY firstName (firstName),
+  KEY lastName (lastName)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE school (
@@ -19,18 +19,20 @@ CREATE TABLE school (
   year INT(11) NOT NULL,
   PRIMARY KEY (id),
   
-  KEY/*INDEX*/ name (name),
-  KEY/*INDEX*/ year (year)
+  KEY name (name),
+  KEY year (year)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE grouptable (
   id INT(11) NOT NULL AUTO_INCREMENT,
   name VARCHAR(50) NOT NULL,
   room VARCHAR(50) NOT NULL,
+  schoolid INT(11) NOT NULL,
   PRIMARY KEY (id),
   
-  KEY/*INDEX*/ name (name),
-  KEY/*INDEX*/ room (room)
+  FOREIGN KEY (`schoolid`) REFERENCES school (id) ON DELETE CASCADE,
+  KEY name (name),
+  KEY room (room)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE subject (
@@ -38,20 +40,5 @@ CREATE TABLE subject (
   name VARCHAR(50) NOT NULL,
   PRIMARY KEY (id),
 
-  KEY/*INDEX*/ name (name)
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
-
-/* SCHOOL : GROUP (1 : many) */
-
-CREATE TABLE school_group (
-  id INT(11) NOT NULL AUTO_INCREMENT,
-  schoolid INT(11) NOT NULL,
-  groupid INT(11) NOT NULL,
-  
-  PRIMARY KEY (`id`),
-  UNIQUE KEY school_group (schoolid, groupid),
-  UNIQUE KEY group_school (groupid, schoolid),
-  FOREIGN KEY (`groupid`) REFERENCES grouptable (id) ON DELETE CASCADE,
-  FOREIGN KEY (`schoolid`) REFERENCES school (id) ON DELETE CASCADE
-  
+  KEY name (name)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
