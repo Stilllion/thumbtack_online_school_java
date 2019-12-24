@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.thumbtack.school.database.mybatis.mappers.SchoolMapper">
+
+	<resultMap id="resultSchool" type="net.thumbtack.school.database.model.School">
+		<id property="id" column="school_id" />
+		<result property="name" column="school_name" />
+		<result property="year" column="year" />
+		
+		<collection property="groups" column="id" javaType="java.util.List"
+					ofType="net.thumbtack.school.database.model.Group">
+			<result property="id" column="group_id" />
+			<result property="name" column="group_name" />
+			<result property="room" column="room" />
+			<result property="schoolId" column="schoolid" />
+			
+			<association property="subjects" resultMap="subjectResult" />
+			<association property="trainees" resultMap="traineeResult" />
+			
+		</collection>
+		
+	</resultMap>
+	
+
+	<resultMap id="subjectResult" type="net.thumbtack.school.database.model.Subject">
+		<id property="id" column="subject_id"/>
+		<result property="name" column="subject_name"/>
+	</resultMap>
+	
+	<resultMap id="traineeResult" type="net.thumbtack.school.database.model.Trainee">
+		<id property="id" column="trainee_id"/>
+		<result property="firstName" column="firstName"/>
+		<result property="lastName" column="lastName"/>
+		<result property="rating" column="rating"/>
+	</resultMap>
+	
+	
+	<select id="getAllUsingJoin" resultMap="resultSchool">
+		 SELECT school.id as school_id, school.name as school_name, year,
+		 grouptable.id as group_id, grouptable.name as group_name, grouptable.room, grouptable.schoolid,
+		 subject.id as subject_id, subject.name as subject_name,
+		 trainee.id as trainee_id, trainee.firstName, trainee.lastName, trainee.rating
+		 FROM school
+		 JOIN grouptable on school.id = schoolid
+		 JOIN group_subject on grouptable.id = group_subject.groupid
+		 JOIN subject on subject.id = subjectid
+		 LEFT JOIN trainee on grouptable.id = trainee.groupid;
+	</select>
+	
+</mapper>

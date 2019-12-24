@@ -11,6 +11,8 @@ public class Trainee
     private String lastName;
     
     private int rating;
+
+    private int groupid;
     
     public Trainee(){}
 
@@ -62,19 +64,27 @@ public class Trainee
         this.rating = rating;
     }
 
+    public int getGroupid() {
+        return groupid;
+    }
+
+    public void setGroupid(int groupid) {
+        this.groupid = groupid;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Trainee)) return false;
         Trainee trainee = (Trainee) o;
-        return id == trainee.id &&
-                rating == trainee.rating &&
-                Objects.equals(firstName, trainee.firstName) &&
-                Objects.equals(lastName, trainee.lastName);
+        return getId() == trainee.getId() &&
+                getRating() == trainee.getRating() &&
+                Objects.equals(getFirstName(), trainee.getFirstName()) &&
+                Objects.equals(getLastName(), trainee.getLastName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, rating);
+        return Objects.hash(getId(), getFirstName(), getLastName(), getRating());
     }
 }

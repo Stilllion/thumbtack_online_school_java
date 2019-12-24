@@ -11,18 +11,31 @@ import java.util.List;
 
 public class JdbcService
 {
+/*
+    При реализации этих методов и SQL создания БД нужно исходить из следующих положений
+
+    Trainee может как принадлежать, так и не принадлежать к Group. Поэтому при вставке  Trainee можно либо указать Group,
+	к которой он будет принадлежать, либо не указывать, в этом случае Trainee не будет принадлежать ни к какой группе.
+	Для вставленного Trainee может быть в дальнейшем произведена привязка к какой-то Group (в этом задании упражнений с такой привязкой нет).
+    Subject всегда вставляется независимо от чего бы то ни было.
+	В дальнейшем Subject может быть привязан к одной или нескольким Group (в этом задании упражнений с такой привязкой нет)
+    School в этом Задании вставляется без своих Group, добавление в нее Group должно быть сделано позже.
+    Group не может быть вставлена без привязки к School.
+
+    Все методы в случае ошибки должны выбрасывать SQLException.
+*/
     // Добавляет Trainee в базу данных.
     public static void insertTrainee(Trainee trainee) throws SQLException
 	{	
-		String insertTraineeQuery = "insert into trainee values(?,?,?,?)";
+		String insertTraineeQuery = "insert into trainee values(?,?,?,?,?)";
         Connection con = JdbcUtils.getConnection();
 
         try (PreparedStatement stmtInsertTrainee = con.prepareStatement(insertTraineeQuery, Statement.RETURN_GENERATED_KEYS);) {			
-		
             stmtInsertTrainee.setNull(1, java.sql.Types.INTEGER);
             stmtInsertTrainee.setString(2, trainee.getFirstName());
             stmtInsertTrainee.setString(3, trainee.getLastName());
             stmtInsertTrainee.setInt(4, trainee.getRating());
+            stmtInsertTrainee.setInt(5, trainee.getGroupid());
 
             stmtInsertTrainee.executeUpdate();
 			
@@ -38,6 +51,12 @@ public class JdbcService
             }
 			
         } catch (SQLException e) {
+            try {
+                con.rollback();
+            } catch (SQLException e1) {
+                throw e1;
+            }
+
             throw e;
         }
 	}
@@ -49,7 +68,6 @@ public class JdbcService
         Connection con = JdbcUtils.getConnection();
 
         try (PreparedStatement stmt = con.prepareStatement(updateQuery)) {				
-		
             stmt.setString(1, trainee.getFirstName());
             stmt.setString(2, trainee.getLastName());
 			stmt.setInt(3, trainee.getRating());
@@ -61,19 +79,15 @@ public class JdbcService
 	}
 
     // Получает Trainee  из базы данных по его ID, используя метод получения “по именам полей”. 
+	// Если Trainee с таким ID нет, возвращает null.
     public static Trainee getTraineeByIdUsingColNames(int traineeId) throws SQLException
 	{
-        String selectQuery = "select * from trainee where id = ?";
+        String selectQuery = "select * from trainee where id = " + Integer.toString(traineeId);
         Connection con = JdbcUtils.getConnection();
         
         Trainee retTrainee = null;
-		
-		try (PreparedStatement stmt = con.prepareStatement(selectQuery, Statement.RETURN_GENERATED_KEYS);) {
-		
-			stmt.setInt(1, traineeId);
-		
-			ResultSet rs = stmt.executeQuery();
-			
+
+        try (Statement stmt = con.createStatement(); ResultSet rs = stmt.executeQuery(selectQuery)) {
             if(rs.next()){
                 int id = rs.getInt("id");
                 String firstName = rs.getString("firstName");
@@ -91,18 +105,15 @@ public class JdbcService
 	}
 
     // Получает Trainee  из базы данных по его ID, используя метод получения “по номерам полей”.
+	// Если Trainee с таким ID нет, возвращает null.
     public static Trainee getTraineeByIdUsingColNumbers(int traineeId) throws SQLException
 	{
-		String selectQuery = "select * from trainee where id = ?";
+		String selectQuery = "select * from trainee where id = " + Integer.toString(traineeId);
         Connection con = JdbcUtils.getConnection();
         Trainee retTrainee = null;
 
-		try (PreparedStatement stmt = con.prepareStatement(selectQuery, Statement.RETURN_GENERATED_KEYS);) {
-		
-			stmt.setInt(1, traineeId);
-		
-			ResultSet rs = stmt.executeQuery();
-			
+        try (Statement stmt = con.createStatement(); ResultSet rs = stmt.executeQuery(selectQuery)) {
+
             if(rs.next()){
                 int id = rs.getInt(1);
                 String firstName = rs.getString(2);
@@ -119,18 +130,15 @@ public class JdbcService
 	}
 
     // Получает все Trainee  из базы данных, используя метод получения “по именам полей”.
+	// Если ни одного Trainee в БД нет,  возвращает пустой список.
     public static List<Trainee> getTraineesUsingColNames() throws SQLException
 	{		
 		List<Trainee> retTrainees = new ArrayList<>();
 		
 		String selectQuery = "select * from trainee";
         Connection con = JdbcUtils.getConnection();
-		
-    	try (PreparedStatement stmt = con.prepareStatement(selectQuery, Statement.RETURN_GENERATED_KEYS);) {
-		
-			
-			ResultSet rs = stmt.executeQuery();
-			
+        try (Statement stmt = con.createStatement(); ResultSet rs = stmt.executeQuery(selectQuery)) {
+
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String firstName = rs.getString("firstName");
@@ -139,6 +147,7 @@ public class JdbcService
 				
                 Trainee trainee = new Trainee(id, firstName, lastName, rating);
 				retTrainees.add(trainee);
+				
             }
         } catch (SQLException e) {
             throw e;
@@ -148,16 +157,16 @@ public class JdbcService
 	}
 
     // Получает все Trainee  из базы данных, используя метод получения “по номерам полей”. 
+	// Если ни одного Trainee в БД нет,  возвращает пустой список.
+	
+	// REDO Call the method that gets One Trainee
     public static List<Trainee> getTraineesUsingColNumbers() throws SQLException
 	{
 		List<Trainee> retTrainees = new ArrayList<>();
 		
 		String selectQuery = "select * from trainee";
         Connection con = JdbcUtils.getConnection();
-		
-      	try (PreparedStatement stmt = con.prepareStatement(selectQuery, Statement.RETURN_GENERATED_KEYS);) {
-		
-			ResultSet rs = stmt.executeQuery();
+        try (Statement stmt = con.createStatement(); ResultSet rs = stmt.executeQuery(selectQuery)) {
 
             while (rs.next()) {
                 int id = rs.getInt(1);
@@ -198,9 +207,9 @@ public class JdbcService
 		String deleteQuery = "delete from trainee";
         Connection con = JdbcUtils.getConnection();
 
-		try (PreparedStatement stmt = con.prepareStatement(deleteQuery)) {
+        try (Statement stmt = con.createStatement()) {
 			
-			stmt.executeUpdate();
+			stmt.executeUpdate(deleteQuery);
 			
         } catch (SQLException e) {
             throw e;
@@ -215,6 +224,8 @@ public class JdbcService
 
         try (PreparedStatement stmtInsertTrainee = con.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);) {
 
+            con.setAutoCommit(false);
+			
             stmtInsertTrainee.setNull(1, java.sql.Types.INTEGER);
             stmtInsertTrainee.setString(2, subject.getName());
             
@@ -232,24 +243,25 @@ public class JdbcService
             }
 			
         } catch (SQLException e) {
+            try {
+                con.rollback();
+            } catch (SQLException e1) {
+                throw e1;
+            }
             throw e;
         }
 	}
 
     // Получает Subject  из базы данных по его ID, используя метод получения “по именам полей”.
+	// Если Subject с таким ID нет, возвращает null.
     public static Subject getSubjectByIdUsingColNames(int subjectId) throws SQLException
 	{
-		String selectQuery = "select * from subject where id = ?";
+		String selectQuery = "select * from subject where id = " + Integer.toString(subjectId);
         Connection con = JdbcUtils.getConnection();
         
         Subject subject = null;
 
-      		try (PreparedStatement stmt = con.prepareStatement(selectQuery, Statement.RETURN_GENERATED_KEYS);) {
-		
-			stmt.setInt(1, subjectId);
-		
-			ResultSet rs = stmt.executeQuery();
-			
+        try (Statement stmt = con.createStatement(); ResultSet rs = stmt.executeQuery(selectQuery)) {
             if(rs.next()){
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
@@ -265,19 +277,15 @@ public class JdbcService
 	}
 
     // Получает Subject  из базы данных по его ID, используя метод получения “по номерам полей”.
+	// Если Subject с таким ID нет, возвращает null.
     public static Subject getSubjectByIdUsingColNumbers(int subjectId) throws SQLException
 	{
-		String selectQuery = "select * from subject where id = ?";
+		String selectQuery = "select * from subject where id = " + Integer.toString(subjectId);
         Connection con = JdbcUtils.getConnection();
         
         Subject subject = null;
 
-		try (PreparedStatement stmt = con.prepareStatement(selectQuery, Statement.RETURN_GENERATED_KEYS);) {
-		
-			stmt.setInt(1, subjectId);
-		
-			ResultSet rs = stmt.executeQuery();
-			
+        try (Statement stmt = con.createStatement(); ResultSet rs = stmt.executeQuery(selectQuery)) {
             if(rs.next()){
                 int id = rs.getInt(1);
                 String name = rs.getString(2);
@@ -298,7 +306,8 @@ public class JdbcService
 		String deleteQuery = "delete from subject";
         Connection con = JdbcUtils.getConnection();
 
-        try (PreparedStatement stmt = con.prepareStatement(deleteQuery, Statement.RETURN_GENERATED_KEYS);) {
+        try (Statement stmt = con.createStatement()) {
+			
 			stmt.executeUpdate(deleteQuery);
 			
         } catch (SQLException e) {
@@ -313,6 +322,8 @@ public class JdbcService
         Connection con = JdbcUtils.getConnection();
 
         try (PreparedStatement stmtInsert = con.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);) {
+
+            con.setAutoCommit(false);
 			
             stmtInsert.setNull(1, java.sql.Types.INTEGER);
             stmtInsert.setString(2, school.getName());
@@ -322,21 +333,27 @@ public class JdbcService
 			
             ResultSet generatedKeys = stmtInsert.getGeneratedKeys();
 			
-            int idSchool = 0;
+            int idSubject = 0;
 			
             if (generatedKeys.next()) {
-                idSchool = generatedKeys.getInt((1));
-				school.setId(idSchool);
+                idSubject = generatedKeys.getInt((1));
+				school.setId(idSubject);
             } else {
                 throw new SQLException("Creating Subject failed, no ID obtained.");
             }
 			
         } catch (SQLException e) {
+            try {
+                con.rollback();
+            } catch (SQLException e1) {
+                throw e1;
+            }
             throw e;
         }	
 	}
 
     // Получает School  из базы данных по ее ID, используя метод получения “по именам полей”.
+	// Если School с таким ID нет, возвращает null.
     public static School getSchoolByIdUsingColNames(int schoolId) throws SQLException
 	{
 		String selectQuery = "select * from school where id = ?";
@@ -369,17 +386,12 @@ public class JdbcService
 	// Если School с таким ID нет, возвращает null.
     public static School getSchoolByIdUsingColNumbers(int schoolId) throws SQLException
 	{
-		String selectQuery = "select * from school where id = ?";
+		String selectQuery = "select * from school where id = " + Integer.toString(schoolId);
         Connection con = JdbcUtils.getConnection();
         
         School school = null;
 
-        try (PreparedStatement stmt = con.prepareStatement(selectQuery, Statement.RETURN_GENERATED_KEYS);) {
-		
-			stmt.setInt(1, schoolId);
-		
-			ResultSet rs = stmt.executeQuery();
-			
+        try (Statement stmt = con.createStatement(); ResultSet rs = stmt.executeQuery(selectQuery)) {
             if(rs.next()){
                 int id = rs.getInt(1);
                 String name = rs.getString(2);
@@ -401,14 +413,15 @@ public class JdbcService
 		String deleteQuery = "delete from school";
         Connection con = JdbcUtils.getConnection();
 
-        try (PreparedStatement stmt = con.prepareStatement(deleteQuery)) {
-			stmt.executeUpdate();
+        try (Statement stmt = con.createStatement()) {
+			
+			stmt.executeUpdate(deleteQuery);
 			
         } catch (SQLException e) {
             throw e;
         }
 	}
-	
+
     // Добавляет Group в базу данных, устанавливая ее принадлежность к школе School.
     public static void insertGroup(School school, Group group) throws SQLException
 	{
@@ -417,13 +430,15 @@ public class JdbcService
 
         try  {
             PreparedStatement stmtInsert = con.prepareStatement(insertGroupQuery, Statement.RETURN_GENERATED_KEYS);
-			
+
+            group.setSchoolId(school.getId());
+
             stmtInsert.setInt(1, group.getId());
             stmtInsert.setString(2, group.getName());
             stmtInsert.setString(3, group.getRoom());
-            stmtInsert.setInt(4, school.getId());
-			
-			stmtInsert.executeUpdate();		
+            stmtInsert.setInt(4, group.getSchoolId());
+
+			stmtInsert.executeUpdate();
 
             ResultSet generatedKeys = stmtInsert.getGeneratedKeys();
 
@@ -435,44 +450,49 @@ public class JdbcService
             } else {
                 throw new SQLException("Creating Subject failed, no ID obtained.");
             }
-			
-			
+
         } catch (SQLException e) {
             throw e;
         }	
 	}
 
     // Получает School по ее ID вместе со всеми ее Group из базы данных. 
+	// Если School с таким ID нет, возвращает null.
     public static School getSchoolByIdWithGroups(int id) throws SQLException
 	{
         Connection con = JdbcUtils.getConnection();
-		String selectQuery = "SELECT * FROM grouptable JOIN school ON schoolid = school.id";
+		String selectQuery = "SELECT ? from ? where ? = ?";
         
         School school = null;
 		Group group = null;
 
 		try( PreparedStatement stmtSelect = con.prepareStatement(selectQuery, Statement.RETURN_GENERATED_KEYS);)
         {
-			ResultSet rs = stmtSelect.executeQuery();
-			
-			while(rs.next()){
-				
-				if(school == null){
-					
-					String schoolName = rs.getString("school.name");
-					int year = rs.getInt("year");
-					school = new School(id, schoolName, year);
-				}
-				
-				int groupId = rs.getInt("grouptable.id");
-				String groupName = rs.getString("grouptable.name");
-				String room = rs.getString("room");
-				
-				group = new Group(groupId, groupName, room);
-				
-				school.getGroups().add(group);
-			}
-          
+            // Construct school from ID
+            ResultSet getSchool = stmtSelect.executeQuery("select * from school where id = " + Integer.toString(id));
+
+            if(getSchool.next())
+            {
+                String schoolName = getSchool.getString("name");
+                int year = getSchool.getInt("year");
+
+                school = new School(id, schoolName, year);
+            }
+
+            ResultSet getGroupRs = stmtSelect.executeQuery(
+					"select * from grouptable where schoolid = " + Integer.toString(school.getId()));
+
+            while (getGroupRs.next()) {
+                int IDGRP = getGroupRs.getInt("id");
+
+                String name = getGroupRs.getString("name");
+                String room = getGroupRs.getString("room");
+
+                group = new Group(IDGRP, name, room);
+
+                school.getGroups().add(group);
+            }
+
         } catch (SQLException e) {
             throw e;
         }
@@ -481,11 +501,11 @@ public class JdbcService
 	}
 
     // Получает список всех School вместе со всеми их Group из базы данных.
+	// Если ни одной  School в БД нет,  возвращает пустой список.
     public static List<School> getSchoolsWithGroups() throws SQLException
 	{
         Connection con = JdbcUtils.getConnection();
-		String selectQuery = "SELECT * FROM grouptable JOIN school ON schoolid = school.id";
-		
+		String selectQuery = "SELECT ? from ? where ? = ?";
 		List<School> retList = new ArrayList<>();
         
         School school = null;
@@ -493,29 +513,35 @@ public class JdbcService
 
 		try( PreparedStatement stmtSelect = con.prepareStatement(selectQuery, Statement.RETURN_GENERATED_KEYS);)
         {
-  			ResultSet rs = stmtSelect.executeQuery();
-			
-			while(rs.next()){
-				
-				int schoolId = rs.getInt("school.id");
-				
-				if(school == null || schoolId != school.getId()){
-					String schoolName = rs.getString("school.name");
-					int year = rs.getInt("year");
-					school = new School(schoolId, schoolName, year);
-					
-					retList.add(school);
-				}
+            // Construct school from ID
+            ResultSet getSchool = stmtSelect.executeQuery("select * from school");
 
-				int groupId = rs.getInt("grouptable.id");
-				String groupName = rs.getString("grouptable.name");
-				String room = rs.getString("room");
-				
-				group = new Group(groupId, groupName, room);
-				
-				retList.get(retList.size() - 1).getGroups().add(group);
-			}
-			
+            while(getSchool.next())
+            {
+				int schoolId = getSchool.getInt("id");
+                String schoolName = getSchool.getString("name");
+                int year = getSchool.getInt("year");
+
+                school = new School(schoolId, schoolName, year);
+				retList.add(school);
+            }
+
+
+            for(School s : retList){
+                ResultSet getGroupRs = stmtSelect.executeQuery(
+                        "select * from grouptable where schoolid = " + Integer.toString(s.getId()));
+
+                while (getGroupRs.next()) {
+
+                    int IDGRP = getGroupRs.getInt("id");
+                    String name = getGroupRs.getString("name");
+                    String room = getGroupRs.getString("room");
+                    group = new Group(IDGRP, name, room);
+
+                    s.getGroups().add(group);
+                }
+            }
+
         } catch (SQLException e) {
             throw e;
         }

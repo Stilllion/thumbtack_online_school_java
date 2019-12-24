@@ -7,6 +7,7 @@ CREATE TABLE trainee (
   firstName VARCHAR(50) NOT NULL,
   lastName VARCHAR(50) NOT NULL,
   rating INT(11) NOT NULL,
+  groupid INT(11),
   PRIMARY KEY (id),
   
   KEY firstName (firstName),
@@ -19,8 +20,7 @@ CREATE TABLE school (
   year INT(11) NOT NULL,
   PRIMARY KEY (id),
   
-  KEY name (name),
-  KEY year (year)
+  UNIQUE KEY name_year (name, year)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE grouptable (
@@ -41,4 +41,15 @@ CREATE TABLE subject (
   PRIMARY KEY (id),
 
   KEY name (name)
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE group_subject (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  groupid INT(11) NOT NULL,
+  subjectid INT(11) NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY group_subject (groupid, subjectid),
+  FOREIGN KEY (groupid) REFERENCES grouptable (id) ON DELETE CASCADE,
+  FOREIGN KEY (subjectid) REFERENCES subject (id) ON DELETE CASCADE
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;

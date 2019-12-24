@@ -15,9 +15,7 @@ public class School
 
     private List<Group> groups;
 
-
     public School(){}
-
 
     public School(int id, String name, int year, List<Group> groups)
     {
@@ -34,7 +32,6 @@ public class School
 		this.year = year;
 		groups = new ArrayList<>();
 	}
-
 
     public School(String name, int year)
     {
@@ -89,17 +86,17 @@ public class School
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof School)) return false;
         School school = (School) o;
-        return id == school.id &&
-                year == school.year &&
-                Objects.equals(name, school.name) &&
-                Objects.equals(groups, school.groups);
+        return getId() == school.getId() &&
+                getYear() == school.getYear() &&
+                Objects.equals(getName(), school.getName()) &&
+                Objects.equals(getGroups(), school.getGroups());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, year, groups);
+        return Objects.hash(getId(), getName(), getYear(), getGroups());
     }
 
     @Override
